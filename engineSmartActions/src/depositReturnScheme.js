@@ -1,9 +1,11 @@
 function runAction(payload) {
+
     payload.data.message = "";
 
     let productIdToQuantity = new Map();
     let targetProductIdToRelationshipRules = new Map();
     let productMap = new Map();
+    let dataChanged = false;
 
     payload.data.related.OrderItem.forEach(orderItem => {
         productIdToQuantity.set(orderItem.Product2Id, orderItem.Quantity);
@@ -37,18 +39,27 @@ function runAction(payload) {
             });
 
             if (productMap.get(orderItem.Product2Id).ProductCode === '9999300') {
-                orderItem.Quantity = tempTotal;
+                if(orderItem.Quantity != tempTotal) {
+                    orderItem.Quantity = tempTotal;
+                    dataChanged = true;
+                }
             }
         }
     });
 
     payload.data.message +=  "Your Deposit Return Scheme has been validated";
 
-    payload.data.updateDeviceData = {
-        Order: true,
-        OrderItem: true
+    if(dataChanged) {
+        payload.data.updateDeviceData = {
+            Order: true,
+            OrderItem: true
+        }
     }
-    payload.data.reprice = true;
+    else {
+        payload.data.updateDeviceData = false;
+    }
+
+    payload.data.reprice = false;
 
     return payload;
 }
