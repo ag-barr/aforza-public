@@ -1,7 +1,6 @@
 function runAction(payload) {
 
     let priceChanged = false;
-
     payload.data.related.OrderItem.forEach(orderItem => {
         if(orderItem.OriginalUnitPrice__c && orderItem.OriginalUnitPrice__c != orderItem.UnitPrice) {
             orderItem.UnitPrice = orderItem.OriginalUnitPrice__c;
@@ -16,9 +15,11 @@ function runAction(payload) {
             OrderItem: true
         };
         payload.data.reprice = false;
-    } else {
+    }
+    else {
         payload.data.message = "Prices correct";
         payload.data.updateDeviceData = false;
         payload.data.reprice = false;
     }
+    return payload;
 }
